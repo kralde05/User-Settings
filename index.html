@@ -3,57 +3,515 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Settings</title>
-  <link rel="stylesheet" href="style.css">
+  <title>User Settings Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0b1628;
+      color: #f2f3f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-image: url("blue.jfif");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: scroll;
+    }
+
+    .modal-toggle {
+      display: none;
+    }
+
+    .btn-open {
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #ffffff;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-open:hover {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-open:active {
+      transform: translateY(-1px);
+    }
+
+    .settings-box {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(25px) scale(0.95);
+      position: fixed;
+      width: calc(100% - 30px);
+      max-width: 540px;
+      background-color: rgba(18, 20, 26, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 22px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    .settings-box form {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 34px;
+    }
+
+    .settings-box form::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .settings-box form::-webkit-scrollbar-track {
+      background: #12141a;
+      margin: 12px 0;
+    }
+
+    .settings-box form::-webkit-scrollbar-thumb {
+      background: #2e323b;
+      border-radius: 4px;
+    }
+
+    .settings-box form::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+
+    #settings-toggle:checked ~ .settings-box {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    #settings-toggle:checked ~ .btn-open {
+      display: none;
+    }
+
+    fieldset {
+      border: none;
+    }
+
+    .settings-header {
+      margin-bottom: 24px;
+    }
+
+    h1#user23 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.4px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #949ba4;
+      margin-top: 4px;
+    }
+
+    .profile-upload-section {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background-color: rgba(25, 28, 36, 0.7);
+      padding: 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 24px;
+      transition: all 0.25s ease;
+    }
+
+    .profile-upload-section:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      background-color: rgba(25, 28, 36, 0.9);
+    }
+
+    .avatar-preview {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #818cf8, #4f46e5);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      border: 2px solid #6366f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 26px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .avatar-preview:hover {
+      transform: scale(1.05);
+    }
+
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .profile-display-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      word-break: break-word;
+    }
+
+    .file-input-btn {
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #312e81, #1e1b4b);
+      color: #ffffff;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-block;
+      width: fit-content;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+
+    .file-input-btn:hover {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border-color: #6366f1;
+      transform: translateY(-1px);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #b5bac1;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      background-color: #12141a;
+      border: 1px solid #282b33;
+      border-radius: 10px;
+      color: #dbdee1;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    input[type="text"]:hover,
+    input[type="date"]:hover,
+    textarea:hover,
+    select:hover {
+      border-color: #40444f;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #6366f1;
+      background-color: #0b0c0e;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .choice-group {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-top: 6px;
+      font-size: 14px;
+      color: #dbdee1;
+    }
+
+    .choice-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+      margin-bottom: 0;
+      cursor: pointer;
+      padding: 10px 14px;
+      background-color: #12141a;
+      border: 1px solid #282b33;
+      border-radius: 10px;
+      flex: 1;
+      transition: all 0.2s ease;
+    }
+
+    .choice-group label:hover {
+      background-color: #1a1d26;
+      border-color: #40444f;
+      color: #ffffff;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      accent-color: #6366f1;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .hint-text {
+      font-size: 12px;
+      color: #949ba4;
+      margin-bottom: 8px;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn-submit {
+      flex: 1;
+      padding: 13px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-close {
+      padding: 13px 22px;
+      background: linear-gradient(135deg, #40444f, #2e323b);
+      color: #dbdee1;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-close:hover {
+      background: linear-gradient(135deg, #4f5461, #40444f);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      font-weight: 600;
+      font-size: 14px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(20px);
+      z-index: 1000;
+    }
+
+    #toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .profile-upload-section { flex-direction: column; text-align: center; }
+      .choice-group { flex-direction: column; align-items: stretch; }
+      .action-row { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
- 
+
   <input type="checkbox" id="settings-toggle" class="modal-toggle">
-  
-  <label for="settings-toggle" class="btn-open">Open Settings</label>
- 
+
+  <label for="settings-toggle" class="btn-open">
+    <span class="gear-icon">⚙</span> Open Settings
+  </label>
+
   <div class="settings-box">
-    <form>
+    <form id="settingsForm" method="POST" action="#" enctype="multipart/form-data">
       <fieldset>
         
+        <div class="settings-header">
+          <h1 id="user23">User Settings</h1>
+          <p class="subtitle">Customize your profile and appearance</p>
+        </div>
+
         <div class="profile-upload-section">
-          <div class="avatar-preview">U</div>
+          <label for="avatarInput" style="cursor: pointer; display: contents;">
+            <div class="avatar-preview" id="avatarPreviewContainer">P</div>
+          </label>
           <div class="profile-info">
-            <div class="profile-display-name">Username</div>
-            <label class="file-input-btn">
-              Change Avatar
-              <input type="file" accept="image/*">
-            </label>
+            <h3 class="profile-display-name" id="displayNameText">Your Name</h3>
+            <div class="upload-controls">
+              <label class="file-input-btn" for="avatarInput">Change avatar</label>
+              <input type="file" id="avatarInput" name="avatar" accept="image/*">
+            </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="display-name">Display Name</label>
-          <input type="text" id="display-name" placeholder="Enter your display name">
+          <label for="full_name">Display Name</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Enter your display name..." required>
         </div>
 
         <div class="form-group">
-          <label for="bio">About Me</label>
-          <div class="hint-text">A short description about yourself.</div>
-          <textarea id="bio" placeholder="Write something..."></textarea>
+          <label for="bio">Bio</label>
+          <textarea id="bio" name="bio" placeholder="Tell us a bit about yourself..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Private Notes</label>
+          <input type="text" id="notes" name="notes" placeholder="Notes (only visible to you)">
+        </div>
+
+        <div class="form-group">
+          <label for="birthday">Birthday</label>
+          <input type="date" id="birthday" name="birthday">
+        </div>
+
+        <div class="form-group">
+          <label for="connection">Add Connection</label>
+          <select id="connection" name="connection">
+            <optgroup label="Gaming">
+              <option value="steam">Steam</option>
+              <option value="riot">Riot Games</option>
+            </optgroup>
+            <optgroup label="Social">
+              <option value="instagram">Instagram</option>
+              <option value="spotify">Spotify</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Account Status</label>
+          <div class="choice-group">
+            <label><input type="radio" name="status" value="online" checked> Online</label>
+            <label><input type="radio" name="status" value="offline"> Offline</label>
+          </div>
         </div>
 
         <div class="form-group">
           <label>Preferences</label>
+          <p class="hint-text">Configure your privacy rules</p>
           <div class="choice-group">
-            <label><input type="radio" name="pref" checked> Option 1</label>
-            <label><input type="radio" name="pref"> Option 2</label>
+            <label><input type="checkbox" name="show_conn" value="yes"> Show Connections</label>
+            <label><input type="checkbox" name="allow_dm" value="yes"> Allow DMs</label>
           </div>
         </div>
-       
+
         <div class="action-row">
-          <label for="settings-toggle" class="btn-cancel">Cancel</label>
-          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="submit" class="btn-submit">Save Changes</button>
+          <label for="settings-toggle" class="btn-close">Cancel</label>
         </div>
 
       </fieldset>
     </form>
   </div>
 
+  <div id="toast">✨ Settings updated successfully!</div>
+
+  <script>
+    const fullNameInput = document.getElementById('full_name');
+    const displayNameText = document.getElementById('displayNameText');
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
+
+    fullNameInput.addEventListener('input', function() {
+      const value = this.value.trim();
+      displayNameText.textContent = value || 'Your Name';
+    });
+
+    avatarInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          avatarPreviewContainer.style.backgroundImage = `url('${e.target.result}')`;
+          avatarPreviewContainer.textContent = '';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    const settingsForm = document.getElementById('settingsForm');
+    const settingsToggle = document.getElementById('settings-toggle');
+    const toast = document.getElementById('toast');
+
+    settingsForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      toast.classList.add('show');
+      settingsToggle.checked = false;
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    });
+  </script>
 </body>
 </html>
